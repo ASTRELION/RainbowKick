@@ -11,6 +11,13 @@ class Rainbow_Commands(commands.Cog, name = "Rainbow Commands"):
         self.client = client
 
 
+    @commands.command("ping")
+    async def ping(self, ctx):
+
+        latency = self.client.latency
+        await ctx.send("Pong! *{}ms*".format(round(latency * 1000)))
+
+
     @commands.command("kick")
     @commands.guild_only()
     @commands.bot_has_permissions(kick_members = True)
@@ -21,35 +28,59 @@ class Rainbow_Commands(commands.Cog, name = "Rainbow Commands"):
         await guild.kick(user, reason = reason)
 
 
-    @commands.command("setsystem")
+    @commands.group("set")
     @commands.guild_only()
     @commands.has_permissions(administrator = True)
-    async def set_system(self, ctx, channel: typing.Optional[discord.TextChannel] = None):
-        """Set the system channel to display messages in"""
+    async def setCmd(self, ctx):
+
+        if (not ctx.invoked_subcommand):
+            await ctx.send("`set` requires a subcommand.")
+
+
+    @setCmd.command("kickmsg")
+    async def kickmsg(self, ctx, *, message: str):
+
+        self.client.write_config(data = {
+            "kick_msg": message
+        })
+
+    
+    @setCmd.command("system")
+    async def system(self, ctx, channel: typing.Optional[discord.TextChannel] = None):
+
         if (not channel):
             channel = ctx.guild.system_channel
-            
 
-    @commands.command("setwelcome")
-    @commands.guild_only()
-    @commands.has_permissions(administrator = True)
-    async def set_welcome(self, ctx, channel: typing.Optional[discord.TextChannel] = None):
-        """Set the server welcome channel"""
-        
-
-    @commands.command("settimeout")
-    @commands.guild_only()
-    @commands.has_permissions(administrator = True)
-    async def set_timeout(self, ctx, timeout: typing.Optional[int] = None):
-        """Set the time it takes in minutes before kicking an inactive user"""
+        self.client.write_config(data = {
+            "system_channel": channel.id
+        })
 
 
-    @commands.command("setrole")
-    @commands.guild_only()
-    @commands.has_permissions(administrator = True)
-    async def set_member_role(self, ctx, member_role: typing.Optional[discord.Role] = None):
-        """Set the role to look for"""
+    @setCmd.command("welcome")
+    async def welcome(self, ctx, channel: typing.Optional[discord.TextChannel] = None):
 
+        if (not channel):
+            channel = ctx.guild.system_channel
+
+        self.client.write_config(data = {
+            "welcome_channel": channel.id
+        })
+
+
+    @setCmd.command("timeout")
+    async def timeout(self, ctx, timeout: int):
+
+        self.client.write_config(data = {
+            "timeout": timeout
+        })
+
+
+    @setCmd.command("role")
+    async def role(self, ctx, role: discord.Role):
+
+        self.client.write_config(data = {
+            "role": role.id
+        })
 
 
 def setup(client):
