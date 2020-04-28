@@ -1,0 +1,7 @@
+{
+    "token": "your_bot_key_here",
+    "prefix": "!",
+    "welcome_channel_id": 0,
+    "system_channel_id": 0,
+    "member_role_id": 0
+}
